@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead & Follow-Up Tracker</title>
+    <style>
+        /* Sura ya Mfumo (CSS) */
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .header { background-color: #1a7844; color: white; padding: 20px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { margin: 5px 0 15px 0; font-size: 14px; opacity: 0.9; }
+        .status-badge { background-color: #2b9356; padding: 5px 10px; border-radius: 15px; font-size: 12px; display: inline-block; }
+        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; margin-top: -10px; }
+        .stat-card { background-color: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-card h3 { margin: 0; font-size: 13px; color: #666; font-weight: normal; }
+        .stat-card p { margin: 5px 0 0 0; font-size: 20px; font-weight: bold; color: #333; }
+        .actions-container { padding: 0 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .btn-primary { background-color: #1a7844; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-secondary { background-color: #e6f2eb; color: #1a7844; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        /* Kadi za Wateja */
+        #wateja-list { padding: 20px; }
+        .kadi-mteja { background-color: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #1a7844; }
+        .btn-whatsapp { margin-top: 10px; padding: 8px 12px; background-color: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Mfumo wa Leads</h1>
+        <p>Lead & Follow-Up Tracker Yako</p>
+        <div class="status-badge">💾 Data salama | 🟢 Online</div>
+    </div>
+
+    <!-- Dashibodi ya Namba -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>Jumla ya Leads</h3>
+            <p id="totalLeads">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Follow-up Leo</h3>
+            <p id="followUpToday">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Waliolipa</h3>
+            <p id="paidLeads">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Mauzo</h3>
+            <p id="totalSales">Tsh 0</p>
+        </div>
+    </div>
+
+    <!-- Vitufe vya Juu -->
+    <div class="actions-container">
+        <button class="btn-primary" id="btnOngeza">+ Ongeza Lead</button>
+        <button class="btn-secondary">⬇ Backup</button>
+        <button class="btn-secondary">⚙ Settings</button>
+    </div>
+
+    <!-- Hapa ndipo kadi za wateja zitaonekana -->
+    <div id="wateja-list"></div>
+
+    <!-- UHAI WA MFUMO (JAVASCRIPT) UMEWEKWA HAPA NDANI -->
+    <script>
+        const btnOngeza = document.getElementById('btnOngeza');
+        const totalLeadsDisplay = document.getElementById('totalLeads');
+        const watejaList = document.getElementById('wateja-list');
+
+        // Vuta data kutoka kwenye Local Storage (Database ya Kompyuta)
+        let wateja = JSON.parse(localStorage.getItem('watejaMofit')) || [];
+
+        // Kazi ya kuchora wateja kwenye kioo
+        function onyeshaWateja() {
+            watejaList.innerHTML = ''; // Safisha kwanza
+            totalLeadsDisplay.innerText = wateja.length; // Sasisha idadi ya jumla
+
+            wateja.forEach(function(mteja) {
+                const kadi = document.createElement('div');
+                kadi.className = 'kadi-mteja';
+                kadi.innerHTML = `
+                    <h3 style="margin: 0; color: #333; font-size: 16px;">${mteja.jina}</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Status: Sijapata</p>
+                    <button class="btn-whatsapp" onclick="alert('Ujumbe wa WhatsApp kwenda kwa ${mteja.jina} utafunguka hapa!')">Tuma WhatsApp</button>
+                `;
+                watejaList.appendChild(kadi);
+            });
+        }
+
+        // Kazi inayofanyika ukibonyeza kitufe cha Ongeza Lead
+        btnOngeza.addEventListener('click', function() {
+            let jina = prompt("Ingiza jina la mteja mpya (Lead):");
+            if (jina) {
+                wateja.push({ jina: jina, status: "Sijapata" });
+                localStorage.setItem('watejaMofit', JSON.stringify(wateja)); // Hifadhi kwenye Database
+                onyeshaWateja(); // Onyesha upya kwenye kioo
+            }
+        });
+
+        // Washa mfumo uanze kusoma wateja mara tu ukurasa unapofunguka
+        onyeshaWateja();
+    </script>
+</body>
+</html>
