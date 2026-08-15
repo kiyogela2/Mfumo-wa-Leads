@@ -1,46 +1,63 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Mfano wa muundo wa HTML wa Fomu yako -->
+<form id="leadForm">
+  <input type="text" id="name" placeholder="Andika jina lako" required />
+  <input type="tel" id="phone" placeholder="Andika namba ya simu" required />
+  <textarea id="needs" placeholder="Andika mahitaji yako"></textarea>
+  <button type="submit" id="submitBtn">Hifadhi Lead</button>
+</form>
+
+<!-- Script ya JavaScript -->
 <script>
-    // Taarifa za kuunganisha na Supabase
-    const SUPABASE_URL = 'https://vysoduunjqmslxejmymm.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5c29kdXVuanFtc2x4ZWpteW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwNDcwOTYsImV4cCI6MjA1NTYyMzA5Nn0.V2-rD4h8_Zk0lW1p6v4x8y2z3A5b7C9d0E1F2G3H4I5';
+  // 1. Weka vigezo vya Supabase mara moja tu
+  const SUPABASE_URL = https://vysoduunjqmslxejmymm.supabase.co
+  const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5c29kdXVuanFtc2x4ZWpteW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTU2NTMsImV4cCI6MjEwMjM3MTY1M30.jLQvG0V5w5G43ps5mft96_quRPNaQ6pJN6fGZ-RPnwE
 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // 2. Hakikisha maktaba ya Supabase imesomwa kabla ya kuendelea
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('leadForm');
+    
+    // Kinga dhidi ya kosa la "form is null"
+    if (!form) {
+      console.warn("Fomu yenye id 'leadForm' haijapatikana kwenye ukurasa huu.");
+      return;
+    }
+
     form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      e.preventDefault(); // Inazuia ukurasa kujirudia (refresh) kabla ya data kutumwa
 
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.textContent = 'Inahifadhi...';
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Inatuma...';
 
-        const jinaVal = document.getElementById('jina').value;
-        const simuVal = document.getElementById('simu').value;
-        const mahitajival = document.getElementById('mahitaji').value;
+      // Kusanya taarifa kutoka kwenye fomu
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const needs = document.getElementById('needs').value.trim();
 
-        try {
-            const { data, error } = await _supabase
-                .from('leads')
-                .insert([
-                    {
-                        jina_kamili: jinaVal,
-                        namba_ya_simu: simuVal,
-                        mahitaji: mahitajival
-                    }
-                ]);
+      try {
+        // Tuma data moja kwa moja kwenye table ya 'leads'
+        const { data, error } = await supabaseClient
+          .from('leads')
+          .insert([{ name: name, phone: phone, needs: needs }]);
 
-            if (error) {
-                throw error;
-            }
-
-            alert('Lead imehifadhiwa mafanikio!');
-            form.reset();
-        } catch (err) {
-            alert('Imeshindikana kuhifadhi lead.');
-            console.error(err);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Hifadhi Lead';
+        if (error) {
+          console.error("Kosa kutoka Supabase:", error.message);
+          alert("Imegoma: " + error.message);
+        } else {
+          console.log("Data imeingia kwa mafanikio:", data);
+          alert("Imesaveka vizuri kwenye Supabase!");
+          form.reset(); // Safisha fomu baada ya kusave
         }
+      } catch (err) {
+        console.error("Kosa la kimfumo:", err);
+        .alert("Kimetokea kosa la mtandao.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Hifadhi Lead';
+      }
     });
+  });
 </script>
