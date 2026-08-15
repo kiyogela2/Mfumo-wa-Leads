@@ -1,7 +1,52 @@
 
 <!DOCTYPE html>
 <html lang="sw">
-<head>
+<head><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // Taarifa za kuunganisha na Supabase
+    const SUPABASE_URL = 'https://vysoduunjqmslxejmymm.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5c29kdXVuanFtc2x4ZWpteW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwNDcwOTYsImV4cCI6MjA1NTYyMzA5Nn0.V2-rD4h8_Zk0lW1p6v4x8y2z3A5b7C9d0E1F2G3H4I5';
+
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('leadForm');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Inahifadhi...';
+
+        const jinaVal = document.getElementById('jina').value;
+        const simuVal = document.getElementById('simu').value;
+        const mahitajival = document.getElementById('mahitaji').value;
+
+        try {
+            const { data, error } = await _supabase
+                .from('leads')
+                .insert([
+                    {
+                        jina_kamili: jinaVal,
+                        namba_ya_simu: simuVal,
+                        mahitaji: mahitajival
+                    }
+                ]);
+
+            if (error) {
+                throw error;
+            }
+
+            alert('Lead imehifadhiwa mafanikio!');
+            form.reset();
+        } catch (err) {
+            alert('Imeshindikana kuhifadhi lead.');
+            console.error(err);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Hifadhi Lead';
+        }
+    });
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mfumo wa Kusanya Leads</title>
