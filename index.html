@@ -1,56 +1,138 @@
+
 <!DOCTYPE html>
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
-    <title>Mfumo wa Leads - Supabase Integration</title>
-    <!-- 1. Pakua Supabase Client Library -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mfumo wa Kusanya Leads</title>
+    <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        button {
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
 
-    <h2>Mfumo wa Kusanya Leads</h2>
-    
-    <!-- Fomu ya Mfano ya Kuingiza Lead -->
-    <form id="leadForm">
-        <input type="text" id="jina" placeholder="Jina Kamili" required><br><br>
-        <input type="text" id="simu" placeholder="Namba ya Simu" required><br><br>
-        <textarea id="mahitaji" placeholder="Mahitaji / Maelezo"></textarea><br><br>
-        <button type="submit">Hifadhi Lead</button>
-    </form>
+    <div class="form-container">
+        <h2>Mfumo wa Kusanya Leads</h2>
+        <form id="leadForm">
+            <div class="form-group">
+                <label for="jina">Jina Kamili</label>
+                <input type="text" id="jina" required placeholder="Weka jina lako hapa">
+            </div>
+            <div class="form-group">
+                <label for="simu">Namba ya Simu</label>
+                <input type="text" id="simu" required placeholder="Mf. 0712345678">
+            </div>
+            <div class="form-group">
+                <label for="mahitaji">Mahitaji Yako</label>
+                <textarea id="mahitaji" required placeholder="Andika mahitaji yako hapa..."></textarea>
+            </div>
+            <button type="submit" id="submitBtn">Hifadhi Lead</button>
+        </form>
+    </div>
 
     <script>
-        // 2. Funguo zako za Supabase zilizounganishwa rasmi
+        // Taarifa za kuunganisha na Supabase
         const SUPABASE_URL = 'https://vysoduunjqmslxejmymm.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_ElBceR-sidt7GccpbLphxg_sY5bKG-M';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5c29kdXVuanFtc2x4ZWpteW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg2ODksImV4cCI6MjA1NjgxNDY4OX0.d1VvW86V-vM3bCjN1V3xK3lF5r5bY2s5X1x2Z3c4V5A'; 
+        // Kumbuka kuweka Key yako halisi kama hii ya juu au ile uliyokuwa unayo kama ilitofautiana
 
-        // Anzisha muunganiko
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 3. Kitendo cha kusikiliza fomu ikitumwa
-        document.getElementById('leadForm').addEventListener('submit', async function(e) {
+        const form = document.getElementById('leadForm');
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const jinaKamili = document.getElementById('jina').value;
-            const nambaYaSimu = document.getElementById('simu').value;
-            const mahitaji = document.getElementById('mahitaji').value;
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Inahifadhi...';
 
-            // Kutuma data kwenye table ya 'leads' ndani ya Supabase
-            const { data, error } = await _supabase
-                .from('leads')
-                .insert([
-                    { jina_kamili: jinaKamili, namba_ya_simu: nambaYaSimu, mahitaji: mahitaji }
-                ]);
+            const jinaVal = document.getElementById('jina').value;
+            const simuVal = document.getElementById('simu').value;
+            const mahitajiVal = document.getElementById('mahitaji').value;
 
-            if (error) {
-                console.error('Hitilafu:', error);
-                alert('Imeshindikana kuhifadhi lead.');
-            } else {
-                alert('Lead imehifadhiwa kikamilifu kwenye Database!');
-                document.getElementById('leadForm').reset();
+            try {
+                const { data, error } = await supabase
+                    .from('leads')
+                    .insert([
+                        { 
+                            jina_kamili: jinaVal, 
+                            namba_ya_simu: simuVal, 
+                            mahitaji: mahitajiVal 
+                        }
+                    ]);
+
+                if (error) {
+                    throw error;
+                }
+
+                alert('Lead imehifadhiwa mafanikio!');
+                form.reset();
+            } catch (err) {
+                alert('Imeshindikana kuhifadhi lead: ' + err.message);
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Hifadhi Lead';
             }
         });
     </script>
-
 </body>
 </html>
